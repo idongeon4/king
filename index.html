@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Key</title>
+    <style>
+        body { background-color: #000; color: #fff; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+        .header-image { max-width: 90%; height: auto; margin-bottom: 2rem; }
+        .puzzle-text { color: #39FF14; font-size: 5rem; font-weight: bold; text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14; margin-bottom: 2rem; }
+        #answerBox { padding: 10px; font-size: 1.2rem; width: 250px; text-align: center; border: 2px solid #39FF14; background-color: #1a1a1a; color: #fff; margin-bottom: 1rem; }
+        #submitBtn { padding: 10px 20px; font-size: 1.2rem; cursor: pointer; background-color: #39FF14; color: #000; border: none; font-weight: bold; }
+        #message { margin-top: 1rem; height: 20px; color: #FF3131; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <img src="https://i.postimg.cc/xCPdDYMy/img1753313612540.jpg" alt="Puzzle Image" class="header-image">
+    <div class="puzzle-text">NMELO</div>
+    <input type="text" id="answerBox" placeholder="Enter the answer">
+    <br>
+    <button id="submitBtn">SUBMIT</button>
+    <div id="message"></div>
+
+    <script>
+        const answerBox = document.getElementById('answerBox');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+
+        async function checkAnswer() {
+            const userAnswer = answerBox.value;
+            if (!userAnswer) return; // 입력값이 없으면 실행 안 함
+
+            // 서버 함수에 정답 확인 요청
+            try {
+                const response = await fetch('/.netlify/functions/checkAnswer', {
+                    method: 'POST',
+                    body: JSON.stringify({ answer: userAnswer })
+                });
+
+                const data = await response.json();
+
+                if (data.correct) {
+                    // 서버로부터 '정답' 응답을 받으면 사이트 이동
+                    window.location.href = 'https://sensational-cendol-dbaf3d.netlify.app';
+                } else {
+                    // 서버로부터 '오답' 응답을 받으면 메시지 표시
+                    messageDiv.textContent = 'INCORRECT';
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Error checking answer.';
+            }
+        }
+        
+        submitBtn.addEventListener('click', checkAnswer);
+        answerBox.addEventListener('keyup', e => e.key === 'Enter' && checkAnswer());
+    </script>
+</body>
+</html>
